@@ -4,7 +4,7 @@ import pickle
 
 app = Flask(__name__)
 
-# Load the model, scaler, and SelectKBest
+# Load the model, scaler, SelectKBest, and feature names
 with open('model/model.pkl', 'rb') as file:
     model = pickle.load(file)
 
@@ -14,9 +14,8 @@ with open('model/scaler.pkl', 'rb') as file:
 with open('model/kbest.pkl', 'rb') as file:
     kbest = pickle.load(file)
 
-# Daftar fitur yang dipilih oleh SelectKBest
-selected_features_indices = kbest.get_support(indices=True)
-selected_feature_names = [f'feature{index + 1}' for index in selected_features_indices]
+with open('model/feature_names.pkl', 'rb') as file:
+    selected_feature_names = pickle.load(file)
 
 @app.route('/')
 def home():
@@ -29,8 +28,7 @@ def predict():
     
     # Proses input
     input_features = []
-    for index in selected_features_indices:
-        feature = f'feature{index + 1}'
+    for feature in selected_feature_names:
         value = input_data.get(feature, 0)  # Jika tidak ada nilai, setel ke 0
         input_features.append(float(value))
     input_features = np.array(input_features).reshape(1, -1)
